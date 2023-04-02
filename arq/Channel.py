@@ -6,7 +6,7 @@
 import numpy
 import komm
 import arq.exceptions.VectorError as verr
-import arq.exceptions.ChannelError as cherr
+import arq.exceptions.MemoryError as cherr
 
 
 class Channel:
@@ -38,7 +38,7 @@ class Channel:
         """
 
         if len(self.__channel_segment) != 0:
-            raise cherr.ChannelError("kanał zajęty", cherr.ChannelErrorCodes.CHANNEL_IS_BUSY)
+            raise cherr.MemoryError("kanał zajęty", cherr.MemoryErrorCodes.OCCUPIED)
         if len(segment) == 0:
             raise verr.VectorError("wektor jest pusty", verr.VectorErrorCodes.EMPTY)
         if not numpy.all(numpy.logical_or(segment == 0, segment == 1)):

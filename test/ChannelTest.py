@@ -3,7 +3,7 @@ import unittest
 import arq.Channel as ChannelModule
 import numpy
 import arq.exceptions.VectorError as verr
-import arq.exceptions.ChannelError as cherr
+import arq.exceptions.MemoryError as cherr
 
 
 class MyTestCase(unittest.TestCase):
@@ -39,7 +39,7 @@ class MyTestCase(unittest.TestCase):
         segment = numpy.array([0, 0, 1])
         channel.send_segment(segment)
 
-        with self.assertRaises(cherr.ChannelError):
+        with self.assertRaises(cherr.MemoryError):
             channel.send_segment(segment)
 
     # Odebranie segmentu z kanału
