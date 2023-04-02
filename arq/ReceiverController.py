@@ -1,6 +1,7 @@
 # Kontroler odbiorcy - wersja deweloperska
 # - Wysyła żądania retransmisji lub potwierdzenia odbioru
 # - Przekazuje wiadomość odbiorcy
+# - Scala otrzymane segmenty w wiadomość
 
 
 import numpy
