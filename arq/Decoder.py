@@ -22,7 +22,7 @@ class Decoder:
     # Wyciąga wiadomość bitową z dekodera.
     #
     # Zwraca:
-    # Segment wiadomość bitową (scalone segmenty) znajduącą się w dekoderze.
+    # Segment bitowy znajduący się w dekoderze.
     # -----------------------------------------------------------------------
-    def pop_message(self) -> numpy.array:
+    def pop_segment(self) -> numpy.array:
         return numpy.array(0)
