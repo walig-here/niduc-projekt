@@ -4,26 +4,66 @@
 
 
 import numpy
+import komm
+import arq.exceptions.VectorError as verr
+import arq.exceptions.MemoryError as cherr
 
 
 class Channel:
-    #-----------------------------------------------------------------------
-    # Wprowadza segment bitowy do kanału.
-    #
-    # Parametry:
-    # segment - segment bitowy wchodzący do kanału
-    #
-    # Zwraca:
-    # Nic.
-    #-----------------------------------------------------------------------
-    def send_segment(self, segment: numpy.array):
-        return
+    def __init__(self, error_rate: float):
+        self.__channel_segment = numpy.array([])
+        self.__error_generator = komm.BinarySymmetricChannel(error_rate)
 
-    # -----------------------------------------------------------------------
-    # Wyciąga segment bitowy z kanału.
-    #
-    # Zwraca:
-    # Segment bitowy znajduący się w kanale.
-    # -----------------------------------------------------------------------
-    def recieve_segment(self) -> numpy.array:
-        return numpy.array(0)
+    def segment(self) -> numpy.array:
+        """
+        WŁĄCZNIE NA POTRZEBY TESTÓW JEDNOSTKOWYCH!
+
+        Pobiera segment z kanału, z pominięciem przekłamań wynikających z
+        transmisji.
+
+        :return: Segment przepływający przez kanał.
+        """
+
+        return self.__channel_segment
+
+    def send_segment(self, segment: numpy.array):
+        """
+        Wprowadza segment bitowy do kanału. Dodatkowo przeprowadza kontrolę poprawności
+        wprowadzanego segmentu. Nie dopuszcza do wprowadzenia nowego segmentu, gdy w kanale
+        znajduje się juz jakiś segment.
+
+        :param segment: segment bitowy wchodzący do kanału
+        :raises VectorError: gdy podano wektor niebitowy lub pusty.
+        :raises ChannelError: gdy w kanale znajduje się już jakiś segment, a nastąpiła próba wprowadzenia kolejnego.
+        """
+
+        if len(self.__channel_segment) != 0:
+            raise cherr.MemoryError("kanał zajęty", cherr.MemoryErrorCodes.OCCUPIED)
+        if len(segment) == 0:
+            raise verr.VectorError("wektor jest pusty", verr.VectorErrorCodes.EMPTY)
+        if not numpy.all(numpy.logical_or(segment == 0, segment == 1)):
+            raise verr.VectorError("wektor nie jest binarny", verr.VectorErrorCodes.NON_BINARY)
+
+        self.__channel_segment = segment
+
+    def __burden(self):
+        """
+        Obciąża aktualnie zawarty w kanale segment błędami transmisji.
+        """
+
+        if len(self.__channel_segment) == 0:
+            return
+        self.__channel_segment = self.__error_generator(self.__channel_segment)
+
+    def receive_segment(self) -> numpy.array:
+        """
+        Wyprowadza segment bitowy z kanału. Zwalnia tym samym kanał dla nowego segmentu.
+        Wyprowadzony segment jest obciążany błędami transmisji, występującymi w kanale.
+
+        :return: Zawarty w kanale segment, obciążony błędami transmisji.
+        """
+
+        self.__burden()
+        channel = self.__channel_segment
+        self.__channel_segment = numpy.array([])
+        return channel
