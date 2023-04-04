@@ -22,15 +22,14 @@ class Encoder:
 
 # __init__
 # length -> ile bitów w segmencie 
-    def push_message(self, message: numpy.array, length=7):
+    def push_message(self, message: numpy.array, codeword_length: int):
 
         self.message = message
         self.counter = 0
-        self.how_many_segments = (len(self.message) // length)+1
+        self.how_many_segments = (len(self.message) // (codeword_length-1))+1
         self.segments = numpy.array_split(message, self.how_many_segments)
 
         for i in range(len(self.segments)):
-
             parity_bit = self.calcParityBit(self.segments[i])
             self.segments[i] = numpy.append(self.segments[i], parity_bit)
 

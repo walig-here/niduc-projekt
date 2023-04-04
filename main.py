@@ -19,7 +19,7 @@ def main():
 
     # Koder pobiera wiadomość
     encoder = EncoderModule.Encoder()
-    encoder.push_message(original_message)
+    encoder.push_message(original_message, codeword_length)
 
     # Koder wysyła segmenty do kontrolera transmisji nadawcy
     # Ten wysyła segment przez kanał, czeka na odpowiedź
@@ -30,7 +30,7 @@ def main():
     receiver_controller = ReceiverCtrlModule.ReceiverController()
     decoder = DecoderModule.Decoder(codeword_length)
 
-    print("\n")
+    print("")
     while True:
         segment_from_encoder = encoder.pop_segment()
         if len(segment_from_encoder) == 0:
@@ -59,10 +59,11 @@ def main():
 
     # Do przesłaniu całej wiadomości kontroler odbiorcy zwraca scaloną wiadomość
     received_message = receiver_controller.pop_message()
-    print("\n\nOtrzymana wiadomość:\t\t\t", received_message)
+    print("\nOtrzymana wiadomość:\t\t\t", received_message)
 
     receiver = ReceiverModule.Receiver()
     receiver.receive_message(received_message, original_message)
+    receiver.save_statistics("stats")
 
 
 if __name__ == "__main__":
