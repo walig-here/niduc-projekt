@@ -17,8 +17,13 @@ class SenderController:
     # Zwraca:
     # Nic.
     # -----------------------------------------------------------------------
+    def __init__(self):
+        self.ack = True
+    
     def push_segment(self, segment: numpy.array):
-        return
+        if self.ack:
+            self.segment = segment
+            self.ack = False
 
     # -----------------------------------------------------------------------
     # Wprowadza do kontrolera odpowiedź z kanału zwrotnego.
@@ -30,7 +35,7 @@ class SenderController:
     # Nic
     # -----------------------------------------------------------------------
     def push_response(self, response: bool):
-        return
+        self.ack = response
 
     # -----------------------------------------------------------------------
     # Wyciąga segment bitowy z kontrolera.
@@ -39,4 +44,4 @@ class SenderController:
     # Segment bitowy z pamięci kontrolera.
     # -----------------------------------------------------------------------
     def pop_segment(self) -> numpy.array:
-        return numpy.array(0)
+        return self.segment
