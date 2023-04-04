@@ -26,8 +26,8 @@ class Encoder:
 
         self.message = message
         self.counter = 0
-        self.how_many_segments = (len(self.message) // (codeword_length-1))+1
-        self.segments = numpy.array_split(message, self.how_many_segments)
+        self.how_many_segments = (len(self.message) // codeword_length)
+        self.segments = numpy.split(message, self.how_many_segments)
 
         for i in range(len(self.segments)):
             parity_bit = self.calcParityBit(self.segments[i])

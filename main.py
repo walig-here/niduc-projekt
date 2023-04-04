@@ -1,70 +1,44 @@
-from arq import Source as SourceModule
-from arq import Encoder as EncoderModule
-from arq import Channel as ChannelModule
-from arq import Decoder as DecoderModule
-from arq import SenderController as SenderCtrlModule
-from arq import ReceiverController as ReceiverCtrlModule
-from arq import Receiver as ReceiverModule
-import numpy as n
+import os
 
-codeword_length = 8
-error_probability = 0.01
+import numpy
+from arq import ARQ as SimulationModule
 
-# Entry point narzędzia symulacyjnego
+# PARAMETRY SYMULACJI
+error_probability = 0.001  # prawdopodobieństwo przekłamania bitu
+message_length = 128       # długość wiadomości
+segment_length = 4         # ilość segmentów
+
+turns = 1000                # ilość powtórzeń symulacji
+file_name = "stats"         # nazwa pliku wyjściowego
+
 def main():
-    # Źródło generuje wiadomość w formie ciągu bitów
-    source = SourceModule.Source()
-    original_message = source.pop_message()
-    print("Wiadomość przed wysłaniem:\t\t", original_message)
 
-    # Koder pobiera wiadomość
-    encoder = EncoderModule.Encoder()
-    encoder.push_message(original_message, codeword_length)
+    if message_length%segment_length != 0:
+        print("Zadano nieprawidłową długość semgnetu!")
+        return
 
-    # Koder wysyła segmenty do kontrolera transmisji nadawcy
-    # Ten wysyła segment przez kanał, czeka na odpowiedź
-    # Jeżeli przyjdzie potwierdzenie odbioru, to wysyłamy kolejny segment
-    # Jeżeli przyjdzie żądanie retransmisji, to wysyłamy ponownie tą samą wiadomość
-    channel = ChannelModule.Channel(error_probability)
-    sender_controller = SenderCtrlModule.SenderController()
-    receiver_controller = ReceiverCtrlModule.ReceiverController()
-    decoder = DecoderModule.Decoder(codeword_length)
+    print("\nRozpoczynam symulacje...")
+    arq_system = SimulationModule.ARQ(error_probability, segment_length)
+    for i in range(0, turns):
 
-    print("")
-    while True:
-        segment_from_encoder = encoder.pop_segment()
-        if len(segment_from_encoder) == 0:
-            break
+        if i % (turns*0.05) == 0:
+            print(str(i/(turns*0.05)*5)+"%\t("+str(i)+"/"+str(turns)+")")
 
-        print("Wysłano segment z kodera:\t\t", segment_from_encoder)
-        sender_controller.push_segment(segment_from_encoder)
-        while True:
-            channel.send_segment(sender_controller.pop_segment())
+        arq_system.simulate_transmission(message_length, segment_length)
+    arq_system.save_results(file_name)
 
-            # Dekoder odbiera segment i odkodowuje go
-            # Jeżeli segment jest niepoprawny, to nie dokonujemy retransmisji
-            segment_from_channel = channel.receive_segment()
-            decoder.push_segment(segment_from_channel)
-            response = decoder.decode_segment()
-            if response:
-                break
-            else:
-                print("Odebrano błędny segment:\t\t", segment_from_channel)
-                decoder.pop_segment()
+    os.system('cls')
+    print_parameters()
+    print("Zapisano", turns, "wyników do", file_name+".csv")
 
-        # Jeżeli dekoder odebrał dobry semgnet, to wysyła go do kontrolera transmisji
-        segment_from_decoder = decoder.pop_segment()
-        print("Odebrano segment z dekodera:\t", segment_from_decoder)
-        receiver_controller.push_message(segment_from_decoder)
+# Główna pętla symulująca całą drogę wiadomości
 
-    # Do przesłaniu całej wiadomości kontroler odbiorcy zwraca scaloną wiadomość
-    received_message = receiver_controller.pop_message()
-    print("\nOtrzymana wiadomość:\t\t\t", received_message)
 
-    receiver = ReceiverModule.Receiver()
-    receiver.receive_message(received_message, original_message)
-    receiver.save_statistics("stats")
-
+def print_parameters():
+    print("\nPARAMETRY SYMULACJI:")
+    print("Długość wiadomości:", message_length, "bitów")
+    print("Długość segmentu:", segment_length, "bitów")
+    print("Prawdopodobieństwo przekłamania bitu:", str(error_probability*100)+"%")
 
 if __name__ == "__main__":
     main()

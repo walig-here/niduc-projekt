@@ -11,8 +11,8 @@ class Source:
     # Zwraca:
     # Wiadomość bitową znajdującą się w źródle.
     # -----------------------------------------------------------------------
-    def pop_message(self) -> numpy.array:
-        return self.generate_random_bits_message(32)
+    def pop_message(self, message_length: int) -> numpy.array:
+        return self.generate_random_bits_message(message_length)
     
 
     def generate_random_bits_message(self, length: int) -> numpy.array:

@@ -12,7 +12,8 @@ class Receiver:
 
     def __init__(self):
         self.error_count = 0
-        self.received_messages = []
+        self.simulation_data = []
+
     # -----------------------------------------------------------------------
     # Odbiera wiadomość z kontrolera transmisji oraz oryginalną wiadomość
     # od nadawcy.
@@ -20,26 +21,28 @@ class Receiver:
     # Parametry:
     # received_message - wiadomość bitowa odbierana przez odbiorce
     # original_message - oryginalna wiadomość bitowa wysłana przez nadawce
-    #
-    # Zwraca:
-    # Nic.
-    # -----------------------------------------------------------------------
-    def receive_message(self, received_message: numpy.array, original_message: numpy.array):
-        self.received_messages.append((received_message, original_message))
-        errors = numpy.sum(received_message != original_message)
-        self.set_error_count(errors)
-
-    # -----------------------------------------------------------------------
-    # Pobiera informacje na temat wykrytych w czasie transmisji błędów.
-    #
-    # Parametry:
     # error_count - ilość wykrytych błędów
     #
     # Zwraca:
     # Nic.
     # -----------------------------------------------------------------------
+    def receive_message(self, received_message: numpy.array, original_message: numpy.array, error_count: numpy.uint):
+        self.simulation_data.append((received_message,
+                                     original_message,
+                                     error_count,
+                                     numpy.count_nonzero(received_message != original_message)
+                                     ))
+
+    # -----------------------------------------------------------------------
+    # Pobiera informacje na temat wykrytych w czasie transmisji błędów.
+    #
+    # Parametry:
+    #
+    # Zwraca:
+    # Nic.
+    # -----------------------------------------------------------------------
     def set_error_count(self, error_count: numpy.uint):
-        self.error_count += error_count
+        self.error_count = error_count
 
     # -----------------------------------------------------------------------
     # Zapisuje statystyki do pliku *.csv
@@ -53,6 +56,6 @@ class Receiver:
     def save_statistics(self, file_name: str):
         with open(file_name, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['Received Message', 'Original Message'])
-            for received_message, original_message in self.received_messages:
-                writer.writerow([received_message, original_message])
+            writer.writerow(['Received Message', 'Original Message', 'Detected errors', 'Undetected errors'])
+            for received_message, original_message, detected_errors, undetected_errors in self.simulation_data:
+                writer.writerow([received_message, original_message, detected_errors, undetected_errors])
