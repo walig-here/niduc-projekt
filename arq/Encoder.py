@@ -22,11 +22,11 @@ class Encoder:
 
 # __init__
 # length -> ile bitów w segmencie 
-    def push_message(self, message: numpy.array, length = 7):
+    def push_message(self, message: numpy.array, length=7):
 
         self.message = message
         self.counter = 0
-        self.how_many_segments = (len(self.message) // length) +1
+        self.how_many_segments = (len(self.message) // length)+1
         self.segments = numpy.array_split(message, self.how_many_segments)
 
         for i in range(len(self.segments)):
@@ -42,11 +42,12 @@ class Encoder:
     # -----------------------------------------------------------------------
     def pop_segment(self) -> numpy.array:
 
-        if numpy.size(self.segments) != 0:
+        if len(self.segments) != 0:
             segment: numpy.array = self.segments[0]
-            self.segments = numpy.delete(self.segments, 0)
+            self.segments.pop(0)
             return segment
-        else: return numpy.empty(0)
+        else:
+            return numpy.array([])
         pass
 
     # def onAckknowledgment(self):
