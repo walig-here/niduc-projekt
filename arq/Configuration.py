@@ -1,20 +1,25 @@
+from arq import Encoder as EncoderModule
+from arq import Channel as ChannelModule
+from arq import Decoder as DecoderModule
 
-# Klasa wczytująca konfigurację aplikacji
+
+# Wczytuje konfigurację aplikacji
 # - ilość prób
 # - nazwa pliku wyjściowego
 # - długość wiadomości
-class ConfigureSimulation:
+def configure_simulation():
     pass
 
 
-# Klasa wczytująca konfigurację kanału
+# Wczytuje konfigurację kanału
 # - ilość segmentów
 # - typ kodowania
-class ConfigureChannel:
+def configure_channel(channel: ChannelModule.Channel):
     pass
 
-# Klasa wczytująca konfiguację kodera/dekodera
+
+# Wczytuje konfiguację kodera/dekodera
 # - BER
 # - parametry kanału
-class ConfigureEncoding:
+def configure_encoding(encoder: EncoderModule.Encoder, decoder: DecoderModule.Decoder):
     pass

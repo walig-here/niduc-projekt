@@ -5,18 +5,20 @@ from arq import Decoder as DecoderModule
 from arq import SenderController as SenderCtrlModule
 from arq import ReceiverController as ReceiverCtrlModule
 from arq import Receiver as ReceiverModule
+from arq import Configuration as Config
 import numpy
 
 class ARQ:
 
     def __init__(self, error_probability, segment_length):
+        Config.configure_simulation()
+        Config.configure_encoding(self.encoder, self.decoder)
+        Config.configure_channel(self.channel)
+
         self.source = SourceModule.Source()
-        self.encoder = EncoderModule.PBEncoder()
-        self.channel = ChannelModule.Channel(error_probability)
         self.sender_controller = SenderCtrlModule.SenderController()
         self.receiver_controller = ReceiverCtrlModule.ReceiverController()
         self.receiver = ReceiverModule.Receiver()
-        self.decoder = DecoderModule.Decoder(segment_length + 1)
 
     def simulate_transmission(self, message_length, segment_length):
         # Źródło generuje wiadomość w formie ciągu bitów
