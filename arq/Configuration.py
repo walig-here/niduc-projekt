@@ -12,14 +12,14 @@ def configure_simulation():
 
 
 # Wczytuje konfigurację kanału
-# - ilość segmentów
-# - typ kodowania
+# - BER
+# - parametry kanału
 def configure_channel(channel: ChannelModule.Channel):
     pass
 
 
 # Wczytuje konfiguację kodera/dekodera
-# - BER
-# - parametry kanału
+# - ilość segmentów
+# - typ kodowania
 def configure_encoding(encoder: EncoderModule.Encoder, decoder: DecoderModule.Decoder):
     pass
