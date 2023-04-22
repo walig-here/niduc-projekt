@@ -1,5 +1,7 @@
 # Źródło - wersja deweloperska
 # - generuje losową wiadomość bitową
+#========================================================================
+# DONE!
 
 import numpy
 

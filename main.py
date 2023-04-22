@@ -6,7 +6,7 @@ from arq import ARQ as SimulationModule
 # PARAMETRY SYMULACJI
 error_probability = 0.001  # prawdopodobieństwo przekłamania bitu
 message_length = 128       # długość wiadomości
-segment_length = 4         # ilość segmentów
+segment_length = 4         # długość segmentów
 
 turns = 1000                # ilość powtórzeń symulacji
 file_name = "stats"         # nazwa pliku wyjściowego

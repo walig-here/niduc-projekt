@@ -2,7 +2,8 @@
 # - Przezysła segment do kanału
 # - Pobiera segment z kodera
 # - Odbiera wiadomości z kanału zwrotnego
-
+#========================================================================
+# DONE!
 
 import numpy
 

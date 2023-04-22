@@ -2,13 +2,18 @@
 # - Segmentuje wiadomość
 # - Dokłada do segmentów narzut związany z kodowaniem
 # - Przekazuje segmenty do kontrolera transmisji nadawcy
+# ========================================================================
+# Koder - wersja ultimate
+# - kody cykliczne
+# - kody BCH
+# - kody Hamminga
+# - kody z powieleniem bitu
 
 
 import numpy
-
 SEGMENT_LENGTH = 8
+
 class Encoder:
-    # -----------------------------------------------------------------------
     # Wprowadza wiadomość bitową do kodera.
     #
     # Parametry:
@@ -17,21 +22,13 @@ class Encoder:
     # Zwraca:
     # Nic.
     # -----------------------------------------------------------------------
-
-
-
-# __init__
-# length -> ile bitów w segmencie 
+    # __init__
+    # length -> ile bitów w segmencie
     def push_message(self, message: numpy.array, codeword_length: int):
-
         self.message = message
-        self.counter = 0
         self.how_many_segments = (len(self.message) // codeword_length)
         self.segments = numpy.split(message, self.how_many_segments)
-
-        for i in range(len(self.segments)):
-            parity_bit = self.calcParityBit(self.segments[i])
-            self.segments[i] = numpy.append(self.segments[i], parity_bit)
+        self.encode_message()
 
     # -----------------------------------------------------------------------
     # Wyciąga kolejny segment bitowy znajdujący się w pamięci kodera.
@@ -49,13 +46,19 @@ class Encoder:
             return numpy.array([])
         pass
 
+class PBEncoder(Encoder):
+    def encode_message(self):
+        for i in range(len(self.segments)):
+            parity_bit = self.calcParityBit(self.segments[i])
+            self.segments[i] = numpy.append(self.segments[i], parity_bit)
+
     # def onAckknowledgment(self):
     #     if self.counter < len(self.segments):
     #         self.counter+=1
     #     else:
     #         pass
-            # clear() 
-            # jeśli wszystkie segmenty będą potwierdzone to clear pamięci encodera?
+    # clear()
+    # jeśli wszystkie segmenty będą potwierdzone to clear pamięci encodera?
 
     # 0 jeśli parzysta, 1 jeśli nieparzysta
     def calcParityBit(self, segment: numpy.array) -> int:
@@ -63,3 +66,18 @@ class Encoder:
             return 0
         else:
             return 1
+
+
+class BCHEncoder(Encoder):
+    def encode_message(self):
+        import komm
+        n = 8  # codeword length
+        k = 128  # message length
+        t = 2  # error-correction capability
+
+        # Create a BCH code object with these parameters
+        bch = komm.BCHCode(8, 18)
+        print(len(self.message))
+        self.message = bch.encode(self.message)
+
+        pass

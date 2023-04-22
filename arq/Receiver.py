@@ -2,6 +2,10 @@
 # - Odbiera wiadomośc od kontrolera odbiorcy
 # - Agreguje statystyki na temat przeprowadzonej transmisji
 # - Zapisuje statystyki do pliku *.csv
+# ========================================================================
+# Odbiorca - wersja ostateczna
+# - zapisywanie danych o efektywnej przepustowości (bity użyteczne / bity przesłane)
+# - zapisywanie danych o łącznej ilości błędów (wykryte + niewykryte)
 
 import csv
 

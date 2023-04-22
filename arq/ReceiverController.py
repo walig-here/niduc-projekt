@@ -1,6 +1,8 @@
 # Kontroler odbiorcy - wersja deweloperska
 # - Przekazuje wiadomość odbiorcy
 # - Scala otrzymane segmenty w wiadomość
+#========================================================================
+# Done!
 
 
 import numpy

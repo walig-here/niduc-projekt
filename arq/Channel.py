@@ -1,7 +1,10 @@
 # Kanał transmisyjny - wersja deweloperska
 # - Odbiera segmenty
 # - Przekłamuje bity z pewnym prawdopodobieństwem
-
+# ========================================================================
+# Kanał - wersja ultimate
+# - przejście na model Gilberta
+# - mechanizm zliczający przesłane przez kanał bity
 
 import numpy
 import komm

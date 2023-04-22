@@ -1,6 +1,13 @@
 # Dekoder - wersja deweloperska
 # - Wykrywa błędy w odebranych segmentach.
 # - Pozbywa się narzutu z otrzymanej wiadomości.
+# ========================================================================
+# Dekoder - wersja ultimate
+# - kody cykliczne
+# - kody BCH
+# - kody Hamminga
+# - kody z powieleniem bitu
+
 import numpy
 import arq.exceptions.VectorError as verr
 import arq.exceptions.MemoryError as merr

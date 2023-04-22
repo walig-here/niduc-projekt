@@ -11,7 +11,7 @@ class ARQ:
 
     def __init__(self, error_probability, segment_length):
         self.source = SourceModule.Source()
-        self.encoder = EncoderModule.Encoder()
+        self.encoder = EncoderModule.PBEncoder()
         self.channel = ChannelModule.Channel(error_probability)
         self.sender_controller = SenderCtrlModule.SenderController()
         self.receiver_controller = ReceiverCtrlModule.ReceiverController()
