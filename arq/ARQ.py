@@ -10,7 +10,7 @@ import numpy
 
 class ARQ:
 
-    def __init__(self, error_probability, segment_length):
+    def __init__(self):
         Config.configure_simulation()
         Config.configure_encoding(self.encoder, self.decoder)
         Config.configure_channel(self.channel)

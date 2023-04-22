@@ -18,7 +18,7 @@ def main():
         return
 
     print("\nRozpoczynam symulacje...")
-    arq_system = SimulationModule.ARQ(error_probability, segment_length)
+    arq_system = SimulationModule.ARQ()
     for i in range(0, turns):
 
         if i % (turns*0.05) == 0:
