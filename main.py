@@ -18,7 +18,7 @@ def main():
         return
 
     print("\nRozpoczynam symulacje...")
-    arq_system = SimulationModule.ARQ()
+    arq_system = SimulationModule.ARQ(message_length, turns, file_name)
     for i in range(0, turns):
 
         if i % (turns*0.05) == 0:
