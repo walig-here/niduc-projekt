@@ -11,14 +11,19 @@ import numpy
 class ARQ:
 
     def __init__(self, message_length: int, turns: int, file_name: str):
-        Config.configure_simulation()
-        Config.configure_encoding(self.encoder, self.decoder)
-        Config.configure_channel(self.channel)
+        #Config.configure_simulation()
+        #Config.configure_encoding(self.encoder, self.decoder)
+        #Config.configure_channel(self.channel)
 
         self.source = SourceModule.Source()
         self.sender_controller = SenderCtrlModule.SenderController()
         self.receiver_controller = ReceiverCtrlModule.ReceiverController()
         self.receiver = ReceiverModule.Receiver()
+
+        # temp
+        self.channel = ChannelModule.Channel(10E-9, 0.1, 0.75)
+        self.encoder = EncoderModule.PBEncoder()
+        self.decoder = DecoderModule.ParityBitDecoder(33)
 
     def simulate_transmission(self, message_length, segment_length):
         # Źródło generuje wiadomość w formie ciągu bitów
@@ -33,6 +38,7 @@ class ARQ:
         # Jeżeli przyjdzie potwierdzenie odbioru, to wysyłamy kolejny segment
         # Jeżeli przyjdzie żądanie retransmisji, to wysyłamy ponownie tą samą wiadomość
 
+        self.channel.reset_bit_counter()
         while True:
             segment_from_encoder = self.encoder.pop_segment()
             if len(segment_from_encoder) == 0:

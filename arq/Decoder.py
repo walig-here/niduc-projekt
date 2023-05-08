@@ -15,10 +15,9 @@ import komm
 
 
 class Decoder:
-    def __init__(self, segment_length: int):
+    def __init__(self):
         self.__received_segment = numpy.array([])
         self.__decoded_segment = numpy.array([])
-        self.__decoding_machine = komm.SingleParityCheckCode(segment_length)
 
     def decode_segment(self) -> bool:
         """
@@ -27,19 +26,7 @@ class Decoder:
         :raises MemoryError: przy próbie dekodowania, gdy w pamięci dekodera nie ma segmentu
         :return: True, gdy segment jest poprawny. False, gdy jest niepoprawny.
         """
-
-        if len(self.__received_segment) == 0:
-            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
-
-        if len(self.__received_segment) != self.__decoding_machine.length:
-            return False
-
-        checksum = self.__received_segment.sum()
-        if checksum % 2 == 1:
-            return False
-
-        self.__decoded_segment = self.__decoding_machine.decode(self.__received_segment)
-        return True
+        pass
 
     def decoded_segment(self):
         return self.__decoded_segment
@@ -90,3 +77,125 @@ class Decoder:
 
         self.__received_segment = numpy.array([])
         return self.__decoded_segment
+
+
+# Dekoder bitu parzystości
+class ParityBitDecoder(Decoder):
+    def __init__(self, segment_length: int):
+        """
+        Tworzy dekoder bitu parzystości.
+
+        :param segment_length: długość segmentu wychodzącego z kodera (dane + PB)
+        """
+        super().__init__()
+        self.__decoding_machine = komm.SingleParityCheckCode(segment_length)
+
+    def decode_segment(self) -> bool:
+        if len(self._Decoder__received_segment) == 0:
+            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
+
+        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
+        syndrom %= 2
+        if syndrom.sum() % 2 != 0:
+            return False
+
+        self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
+        return True
+
+
+# Dekoder - BCH
+class BCHDecoder(Decoder):
+    def __init__(self, control_positions: int, correcting_capability: int):
+        """
+        Tworzy dekoder kodu BCH.
+
+        :param control_positions: ilość pozycji kontrolnych (mu)
+        :param correcting_capability: ilość możliwych do naprawienia błędów
+        """
+        super().__init__()
+        self.__decoding_machine = komm.BCHCode(control_positions, correcting_capability)
+
+    def decode_segment(self) -> bool:
+        if len(self._Decoder__received_segment) == 0:
+            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
+
+        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
+        syndrom %= 2
+        if syndrom.sum() != 0:
+            return False
+
+        self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
+        return True
+
+
+# Dekoder - powielenie bitu
+class RepetitionCodeDecoder(Decoder):
+    def __init__(self, repetition: int):
+        """
+        Tworzy dekoder kodu powielenia bitu.
+
+        :param repetition: ilość powtórzeń bitu
+        """
+        super().__init__()
+        self.__decoding_machine = komm.RepetitionCode(repetition)
+
+    def decode_segment(self) -> bool:
+        if len(self._Decoder__received_segment) == 0:
+            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
+
+        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
+        syndrom %= 2
+        if syndrom.sum() != 0:
+            return False
+
+        self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
+        return True
+
+
+# Dekoder - kod Hamminga
+class HammingDecoder(Decoder):
+    def __init__(self, control_positions: int):
+        """
+        Tworzy dekoder kodu Hamminga.
+
+        :param control_positions: ilość pozycji kontrolnych
+        """
+        super().__init__()
+        self.__decoding_machine = komm.HammingCode(control_positions)
+
+    def decode_segment(self) -> bool:
+        if len(self._Decoder__received_segment) == 0:
+            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
+
+        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
+        syndrom %= 2
+        if syndrom.sum() != 0:
+            return False
+
+        self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
+        return True
+
+
+# Dekoder - kod cykliczny
+class CyclicDecoder(Decoder):
+    def __init__(self, polynomial: int, segment_length: int):
+        """
+        Tworzy dekoder kodu cyklicznego.
+
+        :param polynomial: wielomian generujący
+        :param segment_length: długość słowa kodowego
+        """
+        super().__init__()
+        self.__decoding_machine = komm.CyclicCode(segment_length, generator_polynomial=polynomial)
+
+    def decode_segment(self) -> bool:
+        if len(self._Decoder__received_segment) == 0:
+            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
+
+        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
+        syndrom %= 2
+        if syndrom.sum() != 0:
+            return False
+
+        self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
+        return True
