@@ -236,7 +236,17 @@ class RepetitionEncoder():
             return numpy.array([])
 
 
+# import numpy as np
+# from arq.Encoders import CyclicEncoder
+# opcje
+# enc = CyclicEncoder(23, 2787) #golay
+# enc = CyclicEncoder(15, 1335) #bch (15, 5, 7) 
 
+# mess = np.random.randint(2, size = 12*5)
+
+# enc.push_message(mess)
+
+# print(enc.pop_segment())
 
 class CyclicEncoder():
     def __init__(self, n, polymonial):
