@@ -168,3 +168,44 @@ class BCHEncoder():
             return segment
         else:
             return numpy.array([])
+
+# ten równiez ma z góry narzucony dimension (wielkość segmentu)
+# dla m = 5 dimension = 26
+
+# np
+# import numpy as np
+# from arq.Encoders import HammingEncoder
+# enc = HammingEncoder(5)
+# mess = np.random.randint(2, size = 26*6)
+# enc.push_message(mess)
+
+# print(enc.pop_segment())
+
+class HammingEncoder():
+    def __init__(self, m, ext: bool = False):
+        self.m = m
+        
+        self.hamming = komm.HammingCode(m=m, extended=ext)
+    
+    def push_message(self, message: numpy.array):
+        
+        # długość segmentu 
+        segment_len = self.hamming.dimension
+        self.ilosc_segmentow = len(message) // segment_len
+        self.segments = numpy.split(message, self.ilosc_segmentow)
+        self.encode_message()
+
+    def encode_message(self):
+
+        for i in range(len(self.segments)):
+            self.segments[i] = self.hamming.encode(self.segments[i])
+    
+    
+    def pop_segment(self) -> numpy.array:
+
+        if len(self.segments) != 0:
+            segment: numpy.array = self.segments[0]
+            self.segments.pop(0)
+            return segment
+        else:
+            return numpy.array([])
