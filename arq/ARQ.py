@@ -10,28 +10,30 @@ import numpy
 
 class ARQ:
 
-    def __init__(self, message_length: int, turns: int, file_name: str):
-        Config.configure_simulation()
-        Config.configure_encoding(self.encoder, self.decoder)
-        Config.configure_channel(self.channel)
+    def __init__(self):
+        self.channel = Config.configure_channel()
+        self.encoder, self.decoder = Config.configure_encoding()
 
         self.source = SourceModule.Source()
         self.sender_controller = SenderCtrlModule.SenderController()
         self.receiver_controller = ReceiverCtrlModule.ReceiverController()
         self.receiver = ReceiverModule.Receiver()
 
-    def simulate_transmission(self, message_length, segment_length):
+    def simulate_transmission(self, message_length):
         # Źródło generuje wiadomość w formie ciągu bitów
         original_message = self.source.pop_message(message_length)
-        error_count = numpy.uint(0)
 
         # Koder pobiera wiadomość
-        self.encoder.push_message(original_message, segment_length)
+        self.encoder.push_message(original_message)
 
         # Koder wysyła segmenty do kontrolera transmisji nadawcy
         # Ten wysyła segment przez kanał, czeka na odpowiedź
         # Jeżeli przyjdzie potwierdzenie odbioru, to wysyłamy kolejny segment
         # Jeżeli przyjdzie żądanie retransmisji, to wysyłamy ponownie tą samą wiadomość
+
+        self.channel.reset_bit_counter()
+        self.decoder.reset_error_counter()
+        self.decoder.reset_retransmissions_counter()
 
         while True:
             segment_from_encoder = self.encoder.pop_segment()
@@ -45,12 +47,11 @@ class ARQ:
                 # Jeżeli segment jest niepoprawny, to nie dokonujemy retransmisji
                 segment_from_channel = self.channel.receive_segment()
                 self.decoder.push_segment(segment_from_channel)
-                response = self.decoder.decode_segment()
-                if response:
+                has_not_detected_error = self.decoder.decode_segment()
+                if has_not_detected_error:
                     break
                 else:
                     self.decoder.pop_segment()
-                    error_count += 1
 
             # Jeżeli dekoder odebrał dobry semgnet, to wysyła go do kontrolera transmisji
             segment_from_decoder = self.decoder.pop_segment()
@@ -59,8 +60,7 @@ class ARQ:
         # Do przesłaniu całej wiadomości kontroler odbiorcy zwraca scaloną wiadomość
         received_message = self.receiver_controller.pop_message()
 
-        self.receiver.set_error_count(error_count)
-        self.receiver.receive_message(received_message, original_message, error_count)
+        self.receiver.receive_message(received_message, original_message, self.decoder.get_error_counter(), self.channel.get_bit_count(), self.decoder.get_retransmissions_counter())
 
     def save_results(self, file_name):
         self.receiver.save_statistics(file_name+".csv")

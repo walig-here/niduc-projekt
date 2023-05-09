@@ -63,5 +63,19 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(received_segment), 0)
         self.assertEqual(len(channel.segment()), 0)
 
+    # Test mechanizmu zliczania bitów przesyłanych przez kanał
+    def testChannel_bit_counter(self):
+        channel = ChannelModule.Channel(0.1)
+        segment = numpy.array([1, 0, 1, 0, 1, 0, 1, 1])
+
+        for i in range(0, 100):
+            channel.send_segment(segment)
+            self.assertEqual((i+1)*len(segment), channel.get_bit_count())
+            channel.receive_segment()
+
+        channel.reset_bit_counter()
+        self.assertEqual(0, channel.get_bit_count())
+
+
 if __name__ == '__main__':
     unittest.main()

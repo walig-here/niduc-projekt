@@ -1,9 +1,11 @@
 import string
 import enum
 
+
 class MemoryErrorCodes(enum.Enum):
     OCCUPIED = 0
     ELEMENT_NOT_EXIST = 1
+
 
 class MemoryError(Exception):
     """
