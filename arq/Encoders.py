@@ -209,3 +209,28 @@ class HammingEncoder():
             return segment
         else:
             return numpy.array([])
+
+class RepetitionEncoder():
+    def __init__(self, n):
+        
+        self.rep = komm.RepetitionCode(n)
+    
+    def push_message(self, message: numpy.array):
+        
+        self.segments = numpy.split(message, len(message))
+        self.encode_message()
+
+    def encode_message(self):
+
+        for i in range(len(self.segments)):
+            self.segments[i] = self.rep.encode(self.segments[i])
+    
+    
+    def pop_segment(self) -> numpy.array:
+
+        if len(self.segments) != 0:
+            segment: numpy.array = self.segments[0]
+            self.segments.pop(0)
+            return segment
+        else:
+            return numpy.array([])
