@@ -18,6 +18,20 @@ class Decoder:
     def __init__(self):
         self.__received_segment = numpy.array([])
         self.__decoded_segment = numpy.array([])
+        self.__error_count = 0
+        self.__retransmissions_counter = 0
+
+    def reset_retransmissions_counter(self):
+        self.__retransmissions_counter = 0
+
+    def get_retransmissions_counter(self):
+        return self.__retransmissions_counter
+
+    def reset_error_counter(self):
+        self.__error_count = 0
+
+    def get_error_counter(self):
+        return self.__error_count
 
     def decode_segment(self) -> bool:
         """
@@ -88,7 +102,7 @@ class ParityBitDecoder(Decoder):
         :param segment_length: długość segmentu wychodzącego z kodera (dane + PB)
         """
         super().__init__()
-        self.__decoding_machine = komm.SingleParityCheckCode(segment_length)
+        self.__decoding_machine = komm.SingleParityCheckCode(segment_length+1)
 
     def decode_segment(self) -> bool:
         if len(self._Decoder__received_segment) == 0:
@@ -97,6 +111,8 @@ class ParityBitDecoder(Decoder):
         syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
         syndrom %= 2
         if syndrom.sum() % 2 != 0:
+            self._Decoder__error_count += syndrom.sum()
+            self._Decoder__retransmissions_counter += 1
             return False
 
         self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
@@ -122,6 +138,8 @@ class BCHDecoder(Decoder):
         syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
         syndrom %= 2
         if syndrom.sum() != 0:
+            self._Decoder__error_count += syndrom.sum()
+            self._Decoder__retransmissions_counter += 1
             return False
 
         self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
@@ -146,6 +164,8 @@ class RepetitionCodeDecoder(Decoder):
         syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
         syndrom %= 2
         if syndrom.sum() != 0:
+            self._Decoder__error_count += syndrom.sum()
+            self._Decoder__retransmissions_counter += 1
             return False
 
         self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
@@ -170,6 +190,8 @@ class HammingDecoder(Decoder):
         syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
         syndrom %= 2
         if syndrom.sum() != 0:
+            self._Decoder__error_count += syndrom.sum()
+            self._Decoder__retransmissions_counter += 1
             return False
 
         self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
@@ -195,6 +217,8 @@ class CyclicDecoder(Decoder):
         syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
         syndrom %= 2
         if syndrom.sum() != 0:
+            self._Decoder__error_count += syndrom.sum()
+            self._Decoder__retransmissions_counter += 1
             return False
 
         self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
