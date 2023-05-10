@@ -35,7 +35,8 @@ class Receiver:
             error_count,
             numpy.count_nonzero(received_message != original_message),
             (len(received_message))/total_sent_bits,
-            retransmissions
+            retransmissions,
+            (error_count + numpy.count_nonzero(received_message != original_message)) / total_sent_bits
         ))
 
     # -----------------------------------------------------------------------
@@ -50,11 +51,12 @@ class Receiver:
     def save_statistics(self, file_name: str):
         with open(file_name, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['Bledy', 'Wykryte bledy', 'Niewykryte bledy', 'Efektywna przepustowosc', 'Ilosc retransmisji'])
-            for detected_errors, undetected_errors, throughtput, retransmissions in self.simulation_data:
+            writer.writerow(['Bledy', 'Wykryte bledy', 'Niewykryte bledy', 'Efektywna przepustowosc', 'Ilosc retransmisji', 'Empiryczny BER'])
+            for detected_errors, undetected_errors, throughtput, retransmissions, ber in self.simulation_data:
                 writer.writerow([detected_errors + undetected_errors,
                                  detected_errors,
                                  undetected_errors,
                                  throughtput,
-                                 retransmissions
+                                 retransmissions,
+                                 ber
                                 ])

@@ -14,6 +14,20 @@ import arq.exceptions.MemoryError as merr
 import komm
 
 
+def dot_gf2(matrix_a, matrix_b):
+    if len(matrix_a) != matrix_b.shape[0]:
+        raise ValueError('Macierze mają niezgodne rozmiary!')
+
+    # Utworzenie pustej tablicy wynikowej
+    result = numpy.zeros(matrix_b.shape[1], dtype=int)
+
+    for i in range(matrix_b.shape[1]):
+        for j in range(matrix_b.shape[0]):
+            result[i] ^= matrix_a[j] & matrix_b[j, i]
+
+    return result
+
+
 class Decoder:
     def __init__(self):
         self.__received_segment = numpy.array([])
@@ -108,10 +122,9 @@ class ParityBitDecoder(Decoder):
         if len(self._Decoder__received_segment) == 0:
             raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
 
-        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
-        syndrom %= 2
-        if syndrom.sum() % 2 != 0:
-            self._Decoder__error_count += syndrom.sum()
+        syndrome = dot_gf2(self._Decoder__received_segment, self.__decoding_machine.parity_check_matrix.T)
+        if syndrome.sum() != 0:
+            self._Decoder__error_count += syndrome.sum()
             self._Decoder__retransmissions_counter += 1
             return False
 
@@ -135,10 +148,9 @@ class BCHDecoder(Decoder):
         if len(self._Decoder__received_segment) == 0:
             raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
 
-        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
-        syndrom %= 2
-        if syndrom.sum() != 0:
-            self._Decoder__error_count += syndrom.sum()
+        syndrome = dot_gf2(self._Decoder__received_segment, self.__decoding_machine.parity_check_matrix.T)
+        if syndrome.sum() != 0:
+            self._Decoder__error_count += syndrome.sum()
             self._Decoder__retransmissions_counter += 1
             return False
 
@@ -161,8 +173,7 @@ class RepetitionCodeDecoder(Decoder):
         if len(self._Decoder__received_segment) == 0:
             raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
 
-        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
-        syndrom %= 2
+        syndrome = numpy.mod(numpy.dot(self._Decoder__received_segment, self.__decoding_machine.parity_check_matrix.T), 2)
         if syndrom.sum() != 0:
             self._Decoder__error_count += syndrom.sum()
             self._Decoder__retransmissions_counter += 1
@@ -187,10 +198,9 @@ class HammingDecoder(Decoder):
         if len(self._Decoder__received_segment) == 0:
             raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
 
-        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
-        syndrom %= 2
-        if syndrom.sum() != 0:
-            self._Decoder__error_count += syndrom.sum()
+        syndrome = dot_gf2(self._Decoder__received_segment, self.__decoding_machine.parity_check_matrix.T)
+        if syndrome.sum() != 0:
+            self._Decoder__error_count += syndrome.sum()
             self._Decoder__retransmissions_counter += 1
             return False
 
