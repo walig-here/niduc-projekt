@@ -158,31 +158,6 @@ class BCHDecoder(Decoder):
         return True
 
 
-# Dekoder - powielenie bitu
-class RepetitionCodeDecoder(Decoder):
-    def __init__(self, repetition: int):
-        """
-        Tworzy dekoder kodu powielenia bitu.
-
-        :param repetition: ilość powtórzeń bitu
-        """
-        super().__init__()
-        self.__decoding_machine = komm.RepetitionCode(repetition)
-
-    def decode_segment(self) -> bool:
-        if len(self._Decoder__received_segment) == 0:
-            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
-
-        syndrome = numpy.mod(numpy.dot(self._Decoder__received_segment, self.__decoding_machine.parity_check_matrix.T), 2)
-        if syndrom.sum() != 0:
-            self._Decoder__error_count += syndrom.sum()
-            self._Decoder__retransmissions_counter += 1
-            return False
-
-        self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
-        return True
-
-
 # Dekoder - kod Hamminga
 class HammingDecoder(Decoder):
     def __init__(self, control_positions: int):

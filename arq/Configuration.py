@@ -73,7 +73,7 @@ def configure_encoding():
     # Bit parzystości - parametry:
     # number_of_segments
     if encoding_type == "PB":
-        segment_length = int(config['segment_length'])
+        segment_length = int(config['segment_length'])                  # gługość sgementu, do którego dołączny jest PB
         encoder = EncoderModule.PBEncoder(segment_length)
         decoder = DecoderModule.ParityBitDecoder(segment_length)
 
@@ -81,10 +81,27 @@ def configure_encoding():
     # control_positions
     # correcting_capability
     elif encoding_type == "BCH":
-        control_positions = int(config['control_positions'])
-        correcting_capability = int(config['correcting_capability'])
+        control_positions = int(config['control_positions'])            # mu
+        correcting_capability = int(config['correcting_capability'])    # tau
         encoder = EncoderModule.BCHEncoder(control_positions, correcting_capability)
         decoder = DecoderModule.BCHDecoder(control_positions, correcting_capability)
+
+    # Hamming - parametry:
+    # control_positions
+    # correcting_capability
+    elif encoding_type == "HM":
+        control_positions = int(config['control_positions'])        # mu
+        encoder = EncoderModule.HammingEncoder(control_positions)
+        decoder = DecoderModule.HammingDecoder(control_positions)
+
+    # Hamming - parametry:
+    # control_positions
+    # correcting_capability
+    elif encoding_type == "CRC":
+        codevector_length = int(config['codevector_length'])        # n
+        polynomial = int(config['generator_polynomial'], 2)         # wielomian generujący
+        encoder = EncoderModule.CyclicEncoder(codevector_length, polynomial)
+        decoder = DecoderModule.CyclicDecoder(polynomial, codevector_length)
 
     # Nieznany kod
     else:
