@@ -100,7 +100,7 @@ class Channel:
         if self.__channel_mode == ChannelStates.BSC:
             error_generator = komm.BinarySymmetricChannel(self.__error_rate)
         else:
-            error_generator = komm.BinarySymmetricChannel(self.__error_rate * 1000)
+            error_generator = komm.BinarySymmetricChannel(self.__error_rate * 10E3)
 
         # generowanie błędu
         self.__channel_segment = error_generator(self.__channel_segment)

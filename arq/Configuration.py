@@ -94,15 +94,6 @@ def configure_encoding():
         encoder = EncoderModule.HammingEncoder(control_positions)
         decoder = DecoderModule.HammingDecoder(control_positions)
 
-    # Hamming - parametry:
-    # control_positions
-    # correcting_capability
-    elif encoding_type == "CRC":
-        codevector_length = int(config['codevector_length'])        # n
-        polynomial = int(config['generator_polynomial'], 2)         # wielomian generujący
-        encoder = EncoderModule.CyclicEncoder(codevector_length, polynomial)
-        decoder = DecoderModule.CyclicDecoder(polynomial, codevector_length)
-
     # Nieznany kod
     else:
         encoder = EncoderModule.Encoder()

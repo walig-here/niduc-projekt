@@ -127,18 +127,3 @@ class HammingEncoder(Encoder):
     def encode_message(self):
         for i in range(len(self.segments)):
             self.segments[i] = self.hamming.encode(self.segments[i])
-
-# Koder kodów cyklicznych
-class CyclicEncoder(Encoder):
-    def __init__(self, n, polymonial):
-        super().__init__()
-        self.cyclic = komm.CyclicCode(n, generator_polynomial=polymonial)
-
-    def push_message(self, message: numpy.array):
-
-        self.segments = numpy.split(message, len(message) // self.cyclic.dimension)
-        self.encode_message()
-
-    def encode_message(self):
-        for i in range(len(self.segments)):
-            self.segments[i] = self.cyclic.encode(self.segments[i])

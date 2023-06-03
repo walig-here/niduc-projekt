@@ -181,30 +181,3 @@ class HammingDecoder(Decoder):
 
         self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
         return True
-
-
-# Dekoder - kod cykliczny
-class CyclicDecoder(Decoder):
-    def __init__(self, polynomial: int, segment_length: int):
-        """
-        Tworzy dekoder kodu cyklicznego.
-
-        :param polynomial: wielomian generujący
-        :param segment_length: długość słowa kodowego
-        """
-        super().__init__()
-        self.__decoding_machine = komm.CyclicCode(segment_length, generator_polynomial=polynomial)
-
-    def decode_segment(self) -> bool:
-        if len(self._Decoder__received_segment) == 0:
-            raise merr.MemoryError("brak segmentu do zdekodowania", merr.MemoryErrorCodes.ELEMENT_NOT_EXIST)
-
-        syndrom = self._Decoder__received_segment @ self.__decoding_machine.parity_check_matrix.T
-        syndrom %= 2
-        if syndrom.sum() != 0:
-            self._Decoder__error_count += syndrom.sum()
-            self._Decoder__retransmissions_counter += 1
-            return False
-
-        self._Decoder__decoded_segment = self.__decoding_machine.decode(self._Decoder__received_segment)
-        return True
